@@ -447,39 +447,6 @@ spawn(function()
 end)
 
 -- Toggle untuk No Clip
-
--- Toggle untuk Infinity Geppo
-local Toggle = SettingsTab:Toggle({
-    Title = "Infinity Geppo",
-    Desc = "Op Feature",
-    Callback = function(Value)
-        getgenv().InfGeppo = Value
-    end
-})
-
--- Loop untuk mengatur Infinity Geppo
-spawn(function()
-    while wait() do
-        pcall(function()
-            if getgenv().InfGeppo then
-                for _, v in next, getgc() do
-                    if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Geppo") then
-                        if typeof(v) == "function" and getfenv(v).script == game:GetService("Players").LocalPlayer.Character.Geppo then
-                            for i2, v2 in next, getupvalues(v) do
-                                if tostring(i2) == "9" then
-                                    repeat
-                                        wait(0.1)
-                                        setupvalue(v, i2, 0)
-                                    until not getgenv().InfGeppo or game:GetService("Players").LocalPlayer.Character.Humanoid.Health <= 0
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end)
 -- Slider untuk Speed
 local SpeedSlider = SettingsTab:Slider({
     Title = "Speed | High Risk",
