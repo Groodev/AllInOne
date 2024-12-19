@@ -447,28 +447,6 @@ spawn(function()
 end)
 
 -- Toggle untuk No Clip
-local Toggle = SettingsTab:Toggle({
-    Name = "No Clip",
-    Desc = "classic no clip bitch",
-    Callback = function(Value)
-        _G.NOCLIP = Value
-    end    
-})
-
-spawn(function()
-    while wait() do
-        if _G.NOCLIP then
-            local player = game.Players.LocalPlayer
-            if sethiddenproperty then
-                sethiddenproperty(player, "SimulationRadius", 100)
-            end
-            if setscriptable then
-                setscriptable(player, "SimulationRadius", true)
-                player.SimulationRadius = math.huge
-            end
-        end
-    end
-end)
 
 Local Toggle = SettingsTab:Toggle({
     Title = "Remove Lava",
