@@ -448,26 +448,6 @@ end)
 
 -- Toggle untuk No Clip
 
-Local Toggle = SettingsTab:Toggle({
-    Title = "Remove Lava",
-    Desc = "lava like water",
-    Callback = function()
-        -- Menghapus semua objek bernama "Lava" di Workspace
-        for _, v in pairs(game.Workspace:GetDescendants()) do
-            if v.Name == "Lava" then
-                v:Destroy()
-            end
-        end
-        
-        -- Menghapus semua objek bernama "Lava" di ReplicatedStorage
-        for _, v in pairs(game.ReplicatedStorage:GetDescendants()) do
-            if v.Name == "Lava" then
-                v:Destroy()
-            end
-        end
-    end
-})
-
 -- Toggle untuk Infinity Geppo
 local Toggle = SettingsTab:Toggle({
     Title = "Infinity Geppo",
