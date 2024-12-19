@@ -212,8 +212,8 @@ local Button = FreeScriptTab:Button({
     end,
 })
 local Button = FreeScriptTab:Button({
-    Title = "Idkhub Keyless",
-    Desc = "Injects the anonymousHub script without a key.",
+    Title = "Idkhub Key",
+    Desc = "Injects the anonymousHub script with a key.",
     Callback = function()
         -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
         local success, err = pcall(function()
@@ -235,6 +235,23 @@ local Button = FreeScriptTab:Button({
         -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
         local success, err = pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/refs/heads/main/Source.luaING123%20only%20key.txt"))()
+        end)
+
+        -- Menangani kesalahan jika ada
+        if success then
+            print("Script injected successfully!")
+        else
+            warn("Failed to inject script: " .. err)
+        end
+    end,
+    })
+local Button = FreeScriptTab:Button({
+    Title = "AnDepZaihub Keyless",
+    Desc = "Injects the AnDepZaiHub script without a key.",
+    Callback = function()
+        -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubNewUpdated.lua"))()
         end)
 
         -- Menangani kesalahan jika ada
