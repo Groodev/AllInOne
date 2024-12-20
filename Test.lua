@@ -113,15 +113,23 @@ local Button = Tab:Button({
         local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
         
         local function ListServers(cursor)
-            local Raw = game.HttpGet(game.HttpService, _servers .. ((cursor and "&cursor="..cursor) or ""))
-            return Http:JSONDecode(Raw)
+            local url = _servers .. (cursor and "&cursor="..cursor or "")
+            local success, response = pcall(function()
+                return Http:GetAsync(url)
+            end)
+            if success then
+                return Http:JSONDecode(response)
+            else
+                warn("Failed to fetch servers: " .. response)
+                return nil
+            end
         end
 
         local Server, Next
         repeat
             local Servers = ListServers(Next)
-            if Servers.data and #Servers.data > 0 then
-                Server = Servers.data[1] -- Ambil server dengan jumlah pemain terendah
+            if Servers and Servers.data and #Servers.data > 0 then
+                Server = Servers.data[1]
             else
                 break -- keluar dari loop jika tidak ada server
             end
@@ -132,11 +140,8 @@ local Button = Tab:Button({
             local success, errorMessage = pcall(function()
                 TPS:TeleportToPlaceInstance(_place, Server.id, Players.LocalPlayer)
             end)
-
-            if success then
-                print("Teleporting to server: " .. Server.id)
-            else
-                warn("Failed to teleport: " .. errorMessage) -- Menangani kesalahan teleport
+            if not success then
+                warn("Teleport failed: " .. errorMessage)
             end
         else
             print("No available servers found.")
@@ -419,6 +424,8 @@ local SettingsTab = Window:Tab({
     Title = "Settings",
     Icon = "settings" -- Ganti dengan ikon yang sesuai jika perlu
 })
+
+_G.WalkWater = _G.WalkWater or false
 local Toggle = SettingsTab:Toggle({
     Title = "WalkOnWater",
     Desc = "Allow you to walk on water",
@@ -430,21 +437,31 @@ local Toggle = SettingsTab:Toggle({
 
 -- Menggunakan spawn untuk menjalankan loop secara terpisah
 spawn(function()
-    while task.wait() do
+    while task.wait(0.1) do -- Menambahkan delay untuk mengurangi beban CPU
         pcall(function()
             if _G.WalkWater then
                 -- Mengubah ukuran WaterBase-Plane saat toggle aktif
-                game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 112, 1000)
+                local waterBase = game:GetService("Workspace").Map:FindFirstChild("WaterBase-Plane")
+                if waterBase then
+                    waterBase.Size = Vector3.new(1000, 112, 1000)
+                else
+                    warn("WaterBase-Plane not found in Workspace.Map")
+                end
             else
                 -- Mengubah ukuran WaterBase-Plane saat toggle tidak aktif
-                game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 80, 1000)
+                local waterBase = game:GetService("Workspace").Map:FindFirstChild("WaterBase-Plane")
+                if waterBase then
+                    waterBase.Size = Vector3.new(1000, 80, 1000)
+                else
+                    warn("WaterBase-Plane not found in Workspace.Map")
+                end
             end
         end)
     end
 end)
 
 local Toggle = SettingsTab:Toggle({
-    Name = "Infinity Soru",
+    Title = "Infinity Soru",
     Desc = "OP feature",
     Callback = function(Value)
         getgenv().InfSoru = Value
@@ -474,7 +491,7 @@ spawn(function()
 end)
 
 local Toggle = SettingsTab:Toggle({
-    Name = "No Clip",
+    Title = "No Clip",
     Desc = "Classic no clip feature",
     Value = false, -- Menambahkan nilai default untuk toggle
     Callback = function(Value)
