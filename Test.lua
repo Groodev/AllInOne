@@ -200,6 +200,12 @@ local Button = FreeScriptTab:Button({
         -- Menangani kesalahan jika ada
         if success then
             print("Script injected successfully!")
+
+            -- Hancurkan UI jika toggle diaktifkan
+            if _G.ScriptToggle then
+                Window:Destroy() -- Ganti dengan windui:destroy jika itu adalah nama fungsi yang benar
+                print("UI destroyed as per toggle setting.")
+            end
         else
             warn("Failed to inject script: " .. err)
         end
@@ -218,6 +224,12 @@ local Button = FreeScriptTab:Button({
         -- Menangani kesalahan jika ada
         if success then
             print("Script injected successfully!")
+
+            -- Hancurkan UI jika toggle diaktifkan
+            if _G.ScriptToggle then
+                Window:Destroy() -- Ganti dengan windui:destroy jika itu adalah nama fungsi yang benar
+                print("UI destroyed as per toggle setting.")
+            end
         else
             warn("Failed to inject script: " .. err)
         end
@@ -235,6 +247,12 @@ local Button = FreeScriptTab:Button({
         -- Menangani kesalahan jika ada
         if success then
             print("Script injected successfully!")
+
+            -- Hancurkan UI jika toggle diaktifkan
+            if _G.ScriptToggle then
+                Window:Destroy() -- Ganti dengan windui:destroy jika itu adalah nama fungsi yang benar
+                print("UI destroyed as per toggle setting.")
+            end
         else
             warn("Failed to inject script: " .. err)
         end
@@ -250,12 +268,7 @@ local Button = FreeScriptTab:Button({
         end)
 
         -- Menangani kesalahan jika ada
-        if success then
-            print("Script injected successfully!")
-        else
-            warn("Failed to inject script: " .. err)
-        end
-    end,
+        
     })
 local Button = FreeScriptTab:Button({
     Title = "AnDepZaihub Keyless",
@@ -424,6 +437,13 @@ local SettingsTab = Window:Tab({
     Title = "Settings",
     Icon = "settings" -- Ganti dengan ikon yang sesuai jika perlu
 })
+local Toggle = SettingsTab:Toggle({
+    Title = "Enable Script Destruction",
+    Desc = "When enabled, the UI will be destroyed when the script is injected.",
+    Callback = function(state)
+        _G.ScriptToggle = state -- Menggunakan 'state' untuk menyimpan nilai toggle
+    end,
+    })
 
 _G.WalkWater = _G.WalkWater or false
 local Toggle = SettingsTab:Toggle({
