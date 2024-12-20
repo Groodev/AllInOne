@@ -113,23 +113,15 @@ local Button = Tab:Button({
         local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
         
         local function ListServers(cursor)
-            local url = _servers .. (cursor and "&cursor="..cursor or "")
-            local success, response = pcall(function()
-                return Http:GetAsync(url)
-            end)
-            if success then
-                return Http:JSONDecode(response)
-            else
-                warn("Failed to fetch servers: " .. response)
-                return nil
-            end
+            local Raw = game.HttpGet(game.HttpService, _servers .. ((cursor and "&cursor="..cursor) or ""))
+            return Http:JSONDecode(Raw)
         end
 
         local Server, Next
         repeat
             local Servers = ListServers(Next)
-            if Servers and Servers.data and #Servers.data > 0 then
-                Server = Servers.data[1]
+            if Servers.data and #Servers.data > 0 then
+                Server = Servers.data[1] -- Ambil server dengan jumlah pemain terendah
             else
                 break -- keluar dari loop jika tidak ada server
             end
@@ -140,8 +132,11 @@ local Button = Tab:Button({
             local success, errorMessage = pcall(function()
                 TPS:TeleportToPlaceInstance(_place, Server.id, Players.LocalPlayer)
             end)
-            if not success then
-                warn("Teleport failed: " .. errorMessage)
+
+            if success then
+                print("Teleporting to server: " .. Server.id)
+            else
+                warn("Failed to teleport: " .. errorMessage) -- Menangani kesalahan teleport
             end
         else
             print("No available servers found.")
@@ -200,9 +195,6 @@ local Button = FreeScriptTab:Button({
         -- Menangani kesalahan jika ada
         if success then
             print("Script injected successfully!")
-
-            -- Hancurkan UI jika toggle diaktifkan
-            
         else
             warn("Failed to inject script: " .. err)
         end
@@ -221,9 +213,6 @@ local Button = FreeScriptTab:Button({
         -- Menangani kesalahan jika ada
         if success then
             print("Script injected successfully!")
-
-            -- Hancurkan UI jika toggle diaktifkan
-            
         else
             warn("Failed to inject script: " .. err)
         end
@@ -241,9 +230,6 @@ local Button = FreeScriptTab:Button({
         -- Menangani kesalahan jika ada
         if success then
             print("Script injected successfully!")
-
-            -- Hancurkan UI jika toggle diaktifkan
-            
         else
             warn("Failed to inject script: " .. err)
         end
@@ -259,7 +245,12 @@ local Button = FreeScriptTab:Button({
         end)
 
         -- Menangani kesalahan jika ada
-        
+        if success then
+            print("Script injected successfully!")
+        else
+            warn("Failed to inject script: " .. err)
+        end
+    end,
     })
 local Button = FreeScriptTab:Button({
     Title = "AnDepZaihub Keyless",
@@ -428,9 +419,32 @@ local SettingsTab = Window:Tab({
     Title = "Settings",
     Icon = "settings" -- Ganti dengan ikon yang sesuai jika perlu
 })
+local Toggle = SettingsTab:Toggle({
+    Title = "WalkOnWater",
+    Desc = "Allow you to walk on water",
+    Value = true,
+    Callback = function(state)
+        _G.WalkWater = state -- Menggunakan 'state' untuk menyimpan nilai toggle
+    end    
+})
+
+-- Menggunakan spawn untuk menjalankan loop secara terpisah
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            if _G.WalkWater then
+                -- Mengubah ukuran WaterBase-Plane saat toggle aktif
+                game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 112, 1000)
+            else
+                -- Mengubah ukuran WaterBase-Plane saat toggle tidak aktif
+                game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 80, 1000)
+            end
+        end)
+    end
+end)
 
 local Toggle = SettingsTab:Toggle({
-    Title = "Infinity Soru",
+    Name = "Infinity Soru",
     Desc = "OP feature",
     Callback = function(Value)
         getgenv().InfSoru = Value
@@ -460,7 +474,7 @@ spawn(function()
 end)
 
 local Toggle = SettingsTab:Toggle({
-    Title = "No Clip",
+    Name = "No Clip",
     Desc = "Classic no clip feature",
     Value = false, -- Menambahkan nilai default untuk toggle
     Callback = function(Value)
@@ -484,6 +498,62 @@ spawn(function()
                 end
             end)
         end
+    end
+end)
+
+local Toggle = SettingsTab:Toggle({
+    Title = "Remove Lava",
+    Desc = "Lava like water",
+    Value = false, -- Menambahkan nilai default untuk toggle
+    Callback = function(state)
+        if state then
+            -- Menghapus semua objek bernama "Lava" di Workspace
+            for _, v in pairs(game.Workspace:GetDescendants()) do
+                if v.Name == "Lava" then
+                    v:Destroy()
+                end
+            end
+            
+            -- Menghapus semua objek bernama "Lava" di ReplicatedStorage
+            for _, v in pairs(game.ReplicatedStorage:GetDescendants()) do
+                if v.Name == "Lava" then
+                    v:Destroy()
+                end
+            end
+        end
+    end
+})
+local Toggle = SettingsTab:Toggle({
+    Title = "Infinity Geppo",
+    Desc = "Op Feature",
+    Value = false, -- Menambahkan nilai default untuk toggle
+    Callback = function(Value)
+        getgenv().InfGeppo = Value
+    end
+})
+
+-- Loop untuk mengatur Infinity Geppo
+spawn(function()
+    while wait(0.1) do -- Mengurangi frekuensi loop untuk efisiensi
+        pcall(function()
+            if getgenv().InfGeppo then
+                local player = game:GetService("Players").LocalPlayer
+                if player.Character and player.Character:FindFirstChild("Geppo") then
+                    for _, v in next, getgc() do
+                        if typeof(v) == "function" and getfenv(v).script == player.Character.Geppo then
+                            for i2, v2 in next, getupvalues(v) do
+                                if tostring(i2) == "9" then
+                                    repeat
+                                        wait(0.1)
+                                        setupvalue(v, i2, 0)
+                                    until not getgenv().InfGeppo or player.Character.Humanoid.Health <= 0
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
     end
 end)
 
@@ -512,38 +582,4 @@ local SpeedSlider = SettingsTab:Slider({
             Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue
             
             -- Menghubungkan perubahan WalkSpeed
-            Player.Character.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-                if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-                    Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue
-                end
-            end)
-        end
-    end
-})
-
--- Slider untuk Jump Boost
-local JumpSlider = SettingsTab:Slider({
-    Title = "Jump Boost | High Risk",
-    Step = 1,
-    Value = {
-        Min = 1,
-        Max = 120,
-        Default = 50,
-    },
-    Callback = function(value)
-        getgenv().JumpValue = value -- Mengatur nilai ke JumpValue
-        local Player = game:GetService("Players").LocalPlayer
-        
-        -- Mengatur JumpPower
-        if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-            Player.Character.Humanoid.JumpPower = getgenv().JumpValue
-        end
-    end
-})
-
--- Mengatur nilai awal untuk WalkSpeed dan JumpPower saat karakter muncul
-game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
-    character:WaitForChild("Humanoid")
-    character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue or 26 -- Nilai default jika tidak ada
-    character.Humanoid.JumpPower = getgenv().JumpValue or 50 -- Nilai default jika tidak ada
-end)
+            Player.Character.Humanoid:G
