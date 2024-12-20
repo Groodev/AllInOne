@@ -226,10 +226,7 @@ local Button = FreeScriptTab:Button({
             print("Script injected successfully!")
 
             -- Hancurkan UI jika toggle diaktifkan
-            if _G.ScriptToggle then
-                Window:Destroy() -- Ganti dengan windui:destroy jika itu adalah nama fungsi yang benar
-                print("UI destroyed as per toggle setting.")
-            end
+            
         else
             warn("Failed to inject script: " .. err)
         end
@@ -249,10 +246,7 @@ local Button = FreeScriptTab:Button({
             print("Script injected successfully!")
 
             -- Hancurkan UI jika toggle diaktifkan
-            if _G.ScriptToggle then
-                Window:Destroy() -- Ganti dengan windui:destroy jika itu adalah nama fungsi yang benar
-                print("UI destroyed as per toggle setting.")
-            end
+            
         else
             warn("Failed to inject script: " .. err)
         end
@@ -441,8 +435,7 @@ local Toggle = SettingsTab:Toggle({
     Title = "Enable Script Destruction",
     Desc = "When enabled, the UI will be destroyed when the script is injected.",
     Callback = function(state)
-        _G.ScriptToggle = state -- Menggunakan 'state' untuk menyimpan nilai toggle
-    end,
+        print("kontol")
     })
 
 _G.WalkWater = _G.WalkWater or false
