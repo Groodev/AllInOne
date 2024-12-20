@@ -62,30 +62,92 @@ local Paragraph = Tab:Paragraph({
 })
 
 -- Server Hopper Button
-local function loadScript(url)
-    local success, result = pcall(function()
-        return loadstring(game:HttpGet(url))()
-    end)
-
-    if not success then
-        warn("Error loading script from " .. url .. ": " .. result)
-    end
-end
-
 local button = Tab:Button({
     Title = "Server Hopper",
     Desc = "Move To New Server! | Please Wait..",
     Callback = function()
-        loadScript("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua")
-    end
+        local Http = game:GetService("HttpService")
+        local TPS = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+        local Api = "https://games.roblox.com/v1/games/"
+
+        local _place = game.PlaceId
+        local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
+        
+        local function ListServers(cursor)
+            local Raw = game.HttpGet(game.HttpService, _servers .. ((cursor and "&cursor="..cursor) or ""))
+            return Http:JSONDecode(Raw)
+        end
+
+        local Server, Next
+        repeat
+            local Servers = ListServers(Next)
+            if Servers.data and #Servers.data > 0 then
+                Server = Servers.data[1] -- Ambil server dengan jumlah pemain terendah
+            else
+                break -- keluar dari loop jika tidak ada server
+            end
+            Next = Servers.nextPageCursor
+        until not Next
+
+        if Server then
+            local success, errorMessage = pcall(function()
+                TPS:TeleportToPlaceInstance(_place, Server.id, Players.LocalPlayer)
+            end)
+
+            if success then
+                print("Teleporting to server: " .. Server.id)
+            else
+                warn("Failed to teleport: " .. errorMessage) -- Menangani kesalahan teleport
+            end
+        else
+            print("No available servers found.")
+        end
+    end,
 })
 
 local button = Tab:Button({
     Title = "Lower ServerHop",
     Desc = "Move To Lower Server | Please Wait...",
     Callback = function()
-        loadScript("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua")
-    end
+        local Http = game:GetService("HttpService")
+        local TPS = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+        local Api = "https://games.roblox.com/v1/games/"
+
+        local _place = game.PlaceId
+        local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
+        
+        local function ListServers(cursor)
+            local Raw = game.HttpGet(game.HttpService, _servers .. ((cursor and "&cursor="..cursor) or ""))
+            return Http:JSONDecode(Raw)
+        end
+
+        local Server, Next
+        repeat
+            local Servers = ListServers(Next)
+            if Servers.data and #Servers.data > 0 then
+                Server = Servers.data[1] -- Ambil server dengan jumlah pemain terendah
+            else
+                break -- keluar dari loop jika tidak ada server
+            end
+            Next = Servers.nextPageCursor
+        until not Next
+
+        if Server then
+            local success, errorMessage = pcall(function()
+                TPS:TeleportToPlaceInstance(_place, Server.id, Players.LocalPlayer)
+            end)
+
+            if success then
+                print("Teleporting to server: " .. Server.id)
+            else
+                warn("Failed to teleport: " .. errorMessage) -- Menangani kesalahan teleport
+            end
+        else
+            print("No available servers found.")
+        end
+    end,
 })
 
 local Button = Tab:Button({
