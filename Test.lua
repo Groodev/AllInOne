@@ -525,39 +525,6 @@ local Toggle = SettingsTab:Toggle({
         end
     end
 })
-local Toggle = SettingsTab:Toggle({
-    Title = "Infinity Geppo",
-    Desc = "Op Feature",
-    Value = false, -- Menambahkan nilai default untuk toggle
-    Callback = function(Value)
-        getgenv().InfGeppo = Value
-    end
-})
-
--- Loop untuk mengatur Infinity Geppo
-spawn(function()
-    while wait(0.1) do -- Mengurangi frekuensi loop untuk efisiensi
-        pcall(function()
-            if getgenv().InfGeppo then
-                local player = game:GetService("Players").LocalPlayer
-                if player.Character and player.Character:FindFirstChild("Geppo") then
-                    for _, v in next, getgc() do
-                        if typeof(v) == "function" and getfenv(v).script == player.Character.Geppo then
-                            for i2, v2 in next, getupvalues(v) do
-                                if tostring(i2) == "9" then
-                                    repeat
-                                        wait(0.1)
-                                        setupvalue(v, i2, 0)
-                                    until not getgenv().InfGeppo or player.Character.Humanoid.Health <= 0
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end)
 
 local Button = Tab:Button({
     Title = "Fps Boost",
