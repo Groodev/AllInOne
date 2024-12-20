@@ -10,7 +10,7 @@ local Window = WindUI:CreateWindow({
         Key = "DHOnTop", -- key
         Note = "Join Our Discord To Get The Key!", -- Note
         URL = "https://github.com/Footagesus/WindUI", -- URL To get key (example: Discord)
-        SaveKey = false, -- Saves the key in the folder specified above
+        SaveKey = true, -- Saves the key in the folder specified above
     }, 
     Transparent = false,-- UI Transparency
     Theme = "Dark", -- UI Theme
@@ -68,6 +68,7 @@ Tab:Button({
     Callback = function()
         local Http = game:GetService("HttpService")
         local TPS = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
         local Api = "https://games.roblox.com/v1/games/"
         local _place, _id = game.PlaceId, game.JobId
         local _servers = Api.._place.."/servers/Public?sortOrder=Desc&limit=100"
@@ -81,9 +82,18 @@ Tab:Button({
         repeat
             local Servers = ListServers(Next)
             for i, v in next, Servers.data do
+                -- Memeriksa apakah server memiliki slot kosong dan bukan server saat ini
                 if v.playing < v.maxPlayers and v.id ~= _id then
-                    local s, r = pcall(TPS.TeleportToPlaceInstance, TPS, _place, v.id, Player)
-                    if s then break end
+                    local success, errorMessage = pcall(function()
+                        TPS:TeleportToPlaceInstance(_place, v.id, Players.LocalPlayer) -- Pastikan Player didefinisikan
+                    end)
+
+                    if success then
+                        print("Teleporting to server: " .. v.id)
+                        break -- Berhenti setelah berhasil teleport
+                    else
+                        warn("Failed to teleport: " .. errorMessage) -- Menangani kesalahan teleport
+                    end
                 end
             end
             Next = Servers.nextPageCursor
@@ -96,6 +106,7 @@ local Button = Tab:Button({
     Callback = function()
         local Http = game:GetService("HttpService")
         local TPS = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
         local Api = "https://games.roblox.com/v1/games/"
 
         local _place = game.PlaceId
@@ -110,7 +121,7 @@ local Button = Tab:Button({
         repeat
             local Servers = ListServers(Next)
             if Servers.data and #Servers.data > 0 then
-                Server = Servers.data[1]
+                Server = Servers.data[1] -- Ambil server dengan jumlah pemain terendah
             else
                 break -- keluar dari loop jika tidak ada server
             end
@@ -118,13 +129,20 @@ local Button = Tab:Button({
         until not Next
 
         if Server then
-            TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
+            local success, errorMessage = pcall(function()
+                TPS:TeleportToPlaceInstance(_place, Server.id, Players.LocalPlayer)
+            end)
+
+            if success then
+                print("Teleporting to server: " .. Server.id)
+            else
+                warn("Failed to teleport: " .. errorMessage) -- Menangani kesalahan teleport
+            end
         else
             print("No available servers found.")
         end
     end,
 })
-
 local Button = Tab:Button({
     Title = "Rejoin",
     Desc = "Join this server again | Please Wait...",
@@ -143,26 +161,15 @@ local Input = Tab:Input({
     Desc = "Enter the server ID to teleport.",
     Callback = function(serverId)
         -- Ensure the serverId is provided
-        if serverId and serverId ~= "" then
-            -- Access the ReplicatedStorage and invoke the teleport function
-            local replicatedStorage = game:GetService("ReplicatedStorage")
-            local serverBrowser = replicatedStorage:WaitForChild("__ServerBrowser")
-            
-            -- Invoke the server teleportation
-            local success, message = pcall(function()
-                serverBrowser:InvokeServer('teleport', serverId)
-            end)
+        local TeleService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
 
-            -- Check if the teleportation was successful
-            if success then
-                print("Teleportation successful to server ID: " .. serverId)
-            else
-                warn("Teleportation failed: " .. message)
-            end
+        if Text and Text ~= "" then
+            TeleService:TeleportToPlaceInstance(game.PlaceId, Text, Players.LocalPlayer)
         else
-            warn("Please enter a valid server ID.")
+            print("Invalid Job ID")
         end
-    end,
+        end
 })
 
 local FreeScriptTab = Window:Tab({
@@ -417,16 +424,19 @@ local Toggle = SettingsTab:Toggle({
     Desc = "Allow you to walk on water",
     Value = true,
     Callback = function(state)
-        _G.WalkWater = Value
+        _G.WalkWater = state -- Menggunakan 'state' untuk menyimpan nilai toggle
     end    
 })
 
+-- Menggunakan spawn untuk menjalankan loop secara terpisah
 spawn(function()
     while task.wait() do
         pcall(function()
             if _G.WalkWater then
+                -- Mengubah ukuran WaterBase-Plane saat toggle aktif
                 game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 112, 1000)
             else
+                -- Mengubah ukuran WaterBase-Plane saat toggle tidak aktif
                 game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 80, 1000)
             end
         end)
@@ -461,4 +471,141 @@ spawn(function()
             end
         end)
     end
+end)
+
+local Toggle = SettingsTab:Toggle({
+    Name = "No Clip",
+    Desc = "Classic no clip feature",
+    Value = false, -- Menambahkan nilai default untuk toggle
+    Callback = function(Value)
+        _G.NOCLIP = Value
+    end    
+})
+
+spawn(function()
+    while wait() do
+        if _G.NOCLIP then
+            local player = game.Players.LocalPlayer
+            
+            -- Menggunakan pcall untuk menangani kemungkinan kesalahan
+            pcall(function()
+                if sethiddenproperty then
+                    sethiddenproperty(player, "SimulationRadius", 100)
+                end
+                if setscriptable then
+                    setscriptable(player, "SimulationRadius", true)
+                    player.SimulationRadius = math.huge
+                end
+            end)
+        end
+    end
+end)
+
+local Toggle = SettingsTab:Toggle({
+    Title = "Remove Lava",
+    Desc = "Lava like water",
+    Value = false, -- Menambahkan nilai default untuk toggle
+    Callback = function(state)
+        if state then
+            -- Menghapus semua objek bernama "Lava" di Workspace
+            for _, v in pairs(game.Workspace:GetDescendants()) do
+                if v.Name == "Lava" then
+                    v:Destroy()
+                end
+            end
+            
+            -- Menghapus semua objek bernama "Lava" di ReplicatedStorage
+            for _, v in pairs(game.ReplicatedStorage:GetDescendants()) do
+                if v.Name == "Lava" then
+                    v:Destroy()
+                end
+            end
+        end
+    end
+})
+local Toggle = SettingsTab:Toggle({
+    Title = "Infinity Geppo",
+    Desc = "Op Feature",
+    Value = false, -- Menambahkan nilai default untuk toggle
+    Callback = function(Value)
+        getgenv().InfGeppo = Value
+    end
+})
+
+-- Loop untuk mengatur Infinity Geppo
+spawn(function()
+    while wait(0.1) do -- Mengurangi frekuensi loop untuk efisiensi
+        pcall(function()
+            if getgenv().InfGeppo then
+                local player = game:GetService("Players").LocalPlayer
+                if player.Character and player.Character:FindFirstChild("Geppo") then
+                    for _, v in next, getgc() do
+                        if typeof(v) == "function" and getfenv(v).script == player.Character.Geppo then
+                            for i2, v2 in next, getupvalues(v) do
+                                if tostring(i2) == "9" then
+                                    repeat
+                                        wait(0.1)
+                                        setupvalue(v, i2, 0)
+                                    until not getgenv().InfGeppo or player.Character.Humanoid.Health <= 0
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+local SpeedSlider = SettingsTab:Slider({
+    Title = "Speed | High Risk",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 120,
+        Default = 26,
+    },
+    Callback = function(value)
+        getgenv().WalkSpeedValue = value -- Mengatur nilai ke WalkSpeedValue
+        local Player = game:GetService("Players").LocalPlayer
+        
+        -- Mengatur WalkSpeed dan menghubungkan perubahan
+        if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+            Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue
+            
+            -- Menghubungkan perubahan WalkSpeed
+            Player.Character.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+                if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+                    Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue
+                end
+            end)
+        end
+    end
+})
+
+-- Slider untuk Jump Boost
+local JumpSlider = SettingsTab:Slider({
+    Title = "Jump Boost | High Risk",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 120,
+        Default = 50,
+    },
+    Callback = function(value)
+        getgenv().JumpValue = value -- Mengatur nilai ke JumpValue
+        local Player = game:GetService("Players").LocalPlayer
+        
+        -- Mengatur JumpPower
+        if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+            Player.Character.Humanoid.JumpPower = getgenv().JumpValue
+        end
+    end
+})
+
+-- Mengatur nilai awal untuk WalkSpeed dan JumpPower saat karakter muncul
+game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+    character:WaitForChild("Humanoid")
+    character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue or 26 -- Nilai default jika tidak ada
+    character.Humanoid.JumpPower = getgenv().JumpValue or 50 -- Nilai default jika tidak ada
 end)
