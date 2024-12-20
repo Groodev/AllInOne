@@ -200,7 +200,7 @@ local Button = FreeScriptTab:Button({
     Callback = function()
         -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
         local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/UserDevEthical/Loadstring/2dd3531ecf006856286e2ed9cad363597e6da6ea/CokkaHub.lua"))()
         end)
 
         -- Menangani kesalahan jika ada
