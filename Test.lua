@@ -62,10 +62,11 @@ local Paragraph = Tab:Paragraph({
 })
 
 -- Server Hopper Button
-Tab:Button({
+local button = Tab:Button({
     Title = "Server Hopper",
     Desc = "Move To New Server! | Please Wait..",
     Callback = function()
+        local success, err = pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua"))()
         end)
 
@@ -81,7 +82,8 @@ local Button = Tab:Button({
     Title = "Lower ServerHop",
     Desc = "Move To Lower Server | Please Wait...",
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua"))()
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua"))()
         end)
 
         -- Menangani kesalahan jika ada
