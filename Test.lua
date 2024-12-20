@@ -438,41 +438,13 @@ local Toggle = SettingsTab:Toggle({
         print("kontol")
     })
 
-_G.WalkWater = _G.WalkWater or false
+
 local Toggle = SettingsTab:Toggle({
     Title = "WalkOnWater",
     Desc = "Allow you to walk on water",
     Value = true,
     Callback = function(state)
-        _G.WalkWater = state -- Menggunakan 'state' untuk menyimpan nilai toggle
-    end    
-})
-
--- Menggunakan spawn untuk menjalankan loop secara terpisah
-spawn(function()
-    while task.wait(0.1) do -- Menambahkan delay untuk mengurangi beban CPU
-        pcall(function()
-            if _G.WalkWater then
-                -- Mengubah ukuran WaterBase-Plane saat toggle aktif
-                local waterBase = game:GetService("Workspace").Map:FindFirstChild("WaterBase-Plane")
-                if waterBase then
-                    waterBase.Size = Vector3.new(1000, 112, 1000)
-                else
-                    warn("WaterBase-Plane not found in Workspace.Map")
-                end
-            else
-                -- Mengubah ukuran WaterBase-Plane saat toggle tidak aktif
-                local waterBase = game:GetService("Workspace").Map:FindFirstChild("WaterBase-Plane")
-                if waterBase then
-                    waterBase.Size = Vector3.new(1000, 80, 1000)
-                else
-                    warn("WaterBase-Plane not found in Workspace.Map")
-                end
-            end
-        end)
-    end
-end)
-
+        
 local Toggle = SettingsTab:Toggle({
     Title = "Infinity Soru",
     Desc = "OP feature",
