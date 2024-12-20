@@ -557,6 +557,14 @@ spawn(function()
     end
 end)
 
+local Button = Tab:Button({
+    Title = "Fps Boost",
+    Desc = "Boost Up To 120fps!",
+    Callback = function() 
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FPS-BOOSTER/main/FPSBooster.txt"))()
+    end
+})
+
 local SpeedSlider = SettingsTab:Slider({
     Title = "Speed | High Risk",
     Step = 1,
