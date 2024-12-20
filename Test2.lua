@@ -62,56 +62,32 @@ local Paragraph = Tab:Paragraph({
 })
 
 -- Server Hopper Button
-Tab:Button({
+local function loadScript(url)
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet(url))()
+    end)
+
+    if not success then
+        warn("Error loading script from " .. url .. ": " .. result)
+    end
+end
+
+local button = Tab:Button({
     Title = "Server Hopper",
     Desc = "Move To New Server! | Please Wait..",
     Callback = function()
-        local Http = game:GetService("HttpService")
-        local TPS = game:GetService("TeleportService")
-        local Players = game:GetService("Players")
-        local Api = "https://games.roblox.com/v1/games/"
-        local _place, _id = game.PlaceId, game.JobId
-        local _servers = Api.._place.."/servers/Public?sortOrder=Desc&limit=100"
-
-        local function ListServers(cursor)
-            local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
-            return Http:JSONDecode(Raw)
-        end
-
-        local Next
-        repeat
-            local Servers = ListServers(Next)
-            for i, v in next, Servers.data do
-                -- Memeriksa apakah server memiliki slot kosong dan bukan server saat ini
-                if v.playing < v.maxPlayers and v.id ~= _id then
-                    local success, errorMessage = pcall(function()
-                        TPS:TeleportToPlaceInstance(_place, v.id, Players.LocalPlayer) -- Pastikan Player didefinisikan
-                    end)
-
-                    if success then
-                        print("Teleporting to server: " .. v.id)
-                        break -- Berhenti setelah berhasil teleport
-                    else
-                        warn("Failed to teleport: " .. errorMessage) -- Menangani kesalahan teleport
-                    end
-                end
-            end
-            Next = Servers.nextPageCursor
-        until not Next
-    end,
+        loadScript("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua")
+    end
 })
-local Button = Tab:Button({
+
+local button = Tab:Button({
     Title = "Lower ServerHop",
     Desc = "Move To Lower Server | Please Wait...",
     Callback = function()
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua"))()
-        end)
-        if not success then
-            warn("Error loading Lower ServerHop: " .. err)
-        end
+        loadScript("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua")
     end
 })
+
 local Button = Tab:Button({
     Title = "Rejoin",
     Desc = "Join this server again | Please Wait...",
