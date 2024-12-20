@@ -202,10 +202,7 @@ local Button = FreeScriptTab:Button({
             print("Script injected successfully!")
 
             -- Hancurkan UI jika toggle diaktifkan
-            if _G.ScriptToggle then
-                Window:Destroy() -- Ganti dengan windui:destroy jika itu adalah nama fungsi yang benar
-                print("UI destroyed as per toggle setting.")
-            end
+            
         else
             warn("Failed to inject script: " .. err)
         end
