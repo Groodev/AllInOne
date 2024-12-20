@@ -431,20 +431,7 @@ local SettingsTab = Window:Tab({
     Title = "Settings",
     Icon = "settings" -- Ganti dengan ikon yang sesuai jika perlu
 })
-local Toggle = SettingsTab:Toggle({
-    Title = "Enable Script Destruction",
-    Desc = "When enabled, the UI will be destroyed when the script is injected.",
-    Callback = function(state)
-        print("kontol")
-    })
 
-
-local Toggle = SettingsTab:Toggle({
-    Title = "WalkOnWater",
-    Desc = "Allow you to walk on water",
-    Value = true,
-    Callback = function(state)
-        
 local Toggle = SettingsTab:Toggle({
     Title = "Infinity Soru",
     Desc = "OP feature",
@@ -502,29 +489,6 @@ spawn(function()
         end
     end
 end)
-
-local Toggle = SettingsTab:Toggle({
-    Title = "Remove Lava",
-    Desc = "Lava like water",
-    Value = false, -- Menambahkan nilai default untuk toggle
-    Callback = function(state)
-        if state then
-            -- Menghapus semua objek bernama "Lava" di Workspace
-            for _, v in pairs(game.Workspace:GetDescendants()) do
-                if v.Name == "Lava" then
-                    v:Destroy()
-                end
-            end
-            
-            -- Menghapus semua objek bernama "Lava" di ReplicatedStorage
-            for _, v in pairs(game.ReplicatedStorage:GetDescendants()) do
-                if v.Name == "Lava" then
-                    v:Destroy()
-                end
-            end
-        end
-    end
-})
 
 local Button = Tab:Button({
     Title = "Fps Boost",
