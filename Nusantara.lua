@@ -306,6 +306,24 @@ local Button = FreeScriptTab:Button({
     end,
 })
 
+local Button = FreeScriptTab:Button({
+    Title = "Maruhub Keyless",
+    Desc = "Injects the MaruHub script without a key.",
+    Callback = function()
+        -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/YUKE000/BloxFruit/refs/heads/main/MARU-HUB-CRACKED"))()
+        end)
+
+        -- Menangani kesalahan jika ada
+        if success then
+            print("Script injected successfully!")
+        else
+            warn("Failed to inject script: " .. err)
+        end
+    end,
+})
+
 local Section = FreeScriptTab:Section({
     Title = "Script Kinglegacy Leaked",
     TextXAlignment = "Center", -- Mengatur teks agar berada di tengah
