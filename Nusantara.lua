@@ -143,6 +143,24 @@ local Button = Tab:Button({
         end
     end,
 })
+
+local Button = Tab:Button({
+    Title = "Raitohub Keyless",
+    Desc = "Injects the RaitoHub script without a key.",
+    Callback = function()
+        -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Groodev/AllInOne/refs/heads/main/Lower.lua"))()
+        end)
+
+        -- Menangani kesalahan jika ada
+        if success then
+            print("Script injected successfully!")
+        else
+            warn("Failed to inject script: " .. err)
+        end
+    end,
+})
 local Button = Tab:Button({
     Title = "Rejoin",
     Desc = "Join this server again | Please Wait...",
