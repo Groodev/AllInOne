@@ -573,6 +573,19 @@ local Button = Tab:Button({
     end
 })
 
+local Slider = MainTab:Slider({
+    Title = "Camera View",
+    Step = 1,
+    Value = {
+        Min = 20,
+        Max = 120,
+        Default = 70,
+    },
+    Callback = function(value)
+        game.Workspace.Camera.FieldOfView = value
+    end
+})
+
 local SpeedSlider = SettingsTab:Slider({
     Title = "Speed | High Risk",
     Step = 1,
