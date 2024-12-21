@@ -270,6 +270,42 @@ local Button = FreeScriptTab:Button({
     end,
 })
 
+local Button = FreeScriptTab:Button({
+    Title = "Xerohub Keyless",
+    Desc = "Injects the XeroHub script without a key.",
+    Callback = function()
+        -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://apixerohub.x10.mx/main.lua"))()
+        end)
+
+        -- Menangani kesalahan jika ada
+        if success then
+            print("Script injected successfully!")
+        else
+            warn("Failed to inject script: " .. err)
+        end
+    end,
+})
+
+local Button = FreeScriptTab:Button({
+    Title = "Raitohub Keyless",
+    Desc = "Injects the RaitoHub script without a key.",
+    Callback = function()
+        -- Menggunakan pcall untuk menangani kesalahan saat menginject skrip
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Efe0626/RaitoHub/refs/heads/main/Script"))()
+        end)
+
+        -- Menangani kesalahan jika ada
+        if success then
+            print("Script injected successfully!")
+        else
+            warn("Failed to inject script: " .. err)
+        end
+    end,
+})
+
 local Section = FreeScriptTab:Section({
     Title = "Script Kinglegacy Leaked",
     TextXAlignment = "Center", -- Mengatur teks agar berada di tengah
